@@ -1,21 +1,19 @@
 package LittleMuffinBot;
 
 import battlecode.common.*;
-
 import java.util.Arrays;
 import java.util.Comparator;
-import static LittleMuffinBot.RobotPlayer.deposits;
-
 
 public strictfp class Archon {
     static MapLocation location;
+    // These values are saved between turns at one instance of Archon (so 1 Archon)
+    static int miners = 0, soldiers = 0, builders = 0, sages = 0;
+    static boolean underAttack = false;
 
     // We first try to scan if it's the first turn, else we just try to build if it's possible.
     static void dispatcher(RobotController rc) throws GameActionException {
         location = rc.getLocation();
-        if (RobotPlayer.turnCount == 1) {
-            scanMode(rc);
-        }
+        scanMode(rc);
         buildMode(rc);
     }
 
@@ -23,30 +21,29 @@ public strictfp class Archon {
     static void scanMode(RobotController rc) throws GameActionException {
         rc.setIndicatorString("Scanning");
         int vision = rc.getType().visionRadiusSquared;
-        MapLocation[] nearby = rc.senseNearbyLocationsWithLead(vision); // Bytecode: 100
-        // Bytecode: 500
-        for (MapLocation position : nearby) {
-            if (rc.senseLead(position) > 10) {
-                deposits.put(position, rc.senseLead(position));
-            }
+        RobotInfo[] nearby = rc.senseNearbyRobots(location, vision, rc.getTeam().opponent()); // Bytecode: 100
+        if (nearby.length > 0) {
+            underAttack = true;
         }
     }
 
     // The order we build in right now, due to change in the future.
     static void buildMode(RobotController rc) throws GameActionException {
         rc.setIndicatorString("Building");
-        if (rc.readSharedArray(0) < 20) {
-            build(rc, RobotType.MINER);
-        } else if (rc.readSharedArray(1) < 10) {
+        if (underAttack) {
             build(rc, RobotType.SOLDIER);
-        } else if (rc.readSharedArray(0) < rc.readSharedArray(1) / 2 && rc.getTeamLeadAmount(rc.getTeam()) < 5000) {
+        } else if (miners < 5) {
+            build(rc, RobotType.MINER);
+        } else if (soldiers < 10) {
+            build(rc, RobotType.SOLDIER);
+        } else if (miners < soldiers / 2 && rc.getTeamLeadAmount(rc.getTeam()) < 5000) {
             build(rc, RobotType.MINER);
         } else {
             build(rc, RobotType.SOLDIER);
         }
     }
 
-    // Build the robot at the position that has the least lead.
+    // Build the robot at the position that has the least rubble around it.
     static void build(RobotController rc, RobotType type) throws GameActionException {
         rc.setIndicatorString("Building");
         Direction[] dirs = Arrays.copyOf(RobotPlayer.directions, RobotPlayer.directions.length);
@@ -55,8 +52,8 @@ public strictfp class Archon {
             if (rc.canBuildRobot(type, dir)) {
                 rc.buildRobot(type, dir);
                 switch(type) {
-                    case MINER: rc.writeSharedArray(0, rc.readSharedArray(0) + 1); break;
-                    case SOLDIER: rc.writeSharedArray(1, rc.readSharedArray(1) + 1); break;
+                    case MINER: miners++; break;
+                    case SOLDIER: soldiers++; break;
                     default: break;
                 }
             }

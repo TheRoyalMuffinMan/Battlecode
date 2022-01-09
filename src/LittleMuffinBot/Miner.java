@@ -12,7 +12,7 @@ public strictfp class Miner {
 
     // Every turn, we will first scan with the miner then attempt to mine.
     // If we can't mine, we search then explore.
-    static void dispatcher(RobotController rc) throws GameActionException {
+    static void run(RobotController rc) throws GameActionException {
         location = rc.getLocation();
         vision = rc.getType().visionRadiusSquared;
         scanMode(rc);
@@ -68,10 +68,11 @@ public strictfp class Miner {
         // Might need to remove deposit once we are done mining it!!!!! Note: static variables don't persist
         if (biggestDeposit != null) {
             rc.setIndicatorString("Searching");
-            Direction toMove = location.directionTo(biggestDeposit);
-            if (rc.canMove(toMove)) {
-                rc.move(toMove);
-            }
+            Pathing.walkTowards(rc, biggestDeposit);
+//            Direction toMove = location.directionTo(biggestDeposit);
+//            if (rc.canMove(toMove)) {
+//                rc.move(toMove);
+//            }
         }
     }
 

@@ -10,7 +10,7 @@ public class Soldier {
     static RobotInfo[] nearby;
 
     // Record information then dispatch to scanMode() and attackMode()
-    static void dispatcher(RobotController rc) throws GameActionException {
+    static void run(RobotController rc) throws GameActionException {
         location = rc.getLocation();
         otherTeam = rc.getTeam().opponent();
         vision = rc.getType().visionRadiusSquared;
@@ -25,6 +25,7 @@ public class Soldier {
         for (RobotInfo robot : nearby) {
             MapLocation robotLocation = robot.getLocation();
             if (robot.getType() == RobotType.ARCHON) {
+                // use the first 8 positions to save the enemy archons location
                 for (int i = 0; i <= 6; i += 2) {
                     if (rc.readSharedArray(i) == 0) {
                         rc.writeSharedArray(i, robotLocation.x);
@@ -60,12 +61,14 @@ public class Soldier {
             if (rc.canAttack(nearbyArchon)) {
                 rc.attack(nearbyArchon);
             } else {
-                Direction toMove = rc.getLocation().directionTo(nearbyArchon);
-                if (rc.canMove(toMove)) {
-                    rc.move(toMove);
-                }
+                Pathing.walkTowards(rc, nearbyArchon);
+//                Direction dir = location.directionTo(nearbyArchon);
+//                if (rc.canMove(dir)) {
+//                    rc.move(dir);
+//                }
             }
         } else if (nearby.length != 0) {
+            rc.setIndicatorString("Attacking");
             for (RobotInfo robot : nearby) {
                 if (rc.canAttack(robot.location)) {
                     rc.attack(robot.location);
@@ -84,6 +87,7 @@ public class Soldier {
     // Exploring is done here randoming, we attempt to move in 2 different completely random directions.
     // We catch when we get stuck against the edges of the map.
     static void exploreMode(RobotController rc) throws GameActionException {
+        rc.setIndicatorString("Exploring");
         if (exploreDir == null) {
             RobotPlayer.rng.setSeed(rc.getID());
             exploreDir = RobotPlayer.directions[RobotPlayer.rng.nextInt(RobotPlayer.directions.length)];

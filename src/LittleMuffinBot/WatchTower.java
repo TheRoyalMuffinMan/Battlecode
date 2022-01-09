@@ -19,20 +19,29 @@ public strictfp class WatchTower {
     }
     static void turretMode(RobotController rc, RobotInfo [] robots) throws GameActionException {
 
-        for(int i = 0; i< robots.length; i++){ //could avoid killing all types?
-            if(robots[i].type.equals(RobotType.ARCHON) && rc.canAttack(robots[i].location)){
-                rc.attack(robots[i].location);
+        for(int i = 0; i< robots.length; i++){ //could avoid killing all types? //do a priority queue
+            if(robots[i].type.equals(RobotType.ARCHON){
+               watchAttack(rc, robots[i], robots[i].location);
             }
         }
         robots = rc.senseNearbyRobots(rc.getType().visionRadiusSquared, rc.getTeam().opponent());
         for(int i = 0; i< robots.length; i++){ //could avoid killing all?
-            if(rc.canAttack(robots[i].location)) {
-                rc.attack(robots[i].location);
-            }
+            watchAttack(rc, robots[i], robots[i].location);
+
         }
 
         rc.transform(); //switch to portable
         portableMode(rc);
+    }
+
+    static void watchAttack(RobotController rc, RobotInfo robot, MapLocation location) throws GameActionException {
+        while(robot.health > 0){
+            if(rc.canAttack(location)){
+                rc.attack(location);
+            } else {
+                break;
+            }
+        }
     }
 
     static void portableMode(RobotController rc) throws GameActionException {

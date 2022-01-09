@@ -11,7 +11,7 @@ public strictfp class Archon {
     static boolean underAttack = false;
 
     // We first try to scan if it's the first turn, else we just try to build if it's possible.
-    static void dispatcher(RobotController rc) throws GameActionException {
+    static void run(RobotController rc) throws GameActionException {
         location = rc.getLocation();
         scanMode(rc);
         buildMode(rc);

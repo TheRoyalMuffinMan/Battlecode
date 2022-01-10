@@ -1,6 +1,7 @@
 package LittleMuffinBot;
 
 import battlecode.common.*;
+
 import java.util.Arrays;
 import java.util.Comparator;
 
@@ -10,6 +11,7 @@ public strictfp class Archon {
     static int miners = 0, soldiers = 0, builders = 20, sages = 0;
     static boolean underAttack = false;
     static int turn = 0;
+
 
     // We first try to scan if it's the first turn, else we just try to build if it's possible.
     static void run(RobotController rc) throws GameActionException {

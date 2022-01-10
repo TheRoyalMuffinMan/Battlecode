@@ -1,6 +1,10 @@
 package LittleMuffinBot;
 
-import battlecode.common.*;
+import battlecode.common.Direction;
+import battlecode.common.GameActionException;
+import battlecode.common.MapLocation;
+import battlecode.common.RobotController;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -20,6 +24,7 @@ public strictfp class Miner {
             searchMode(rc);
             Exploration.run(rc);
         }
+        findEnemyArchon.sense(rc);
     }
     // Scan for nearby deposits in the static map we collected from all the robots this turn.
     static void scanMode(RobotController rc) throws GameActionException {

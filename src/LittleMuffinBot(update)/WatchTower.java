@@ -1,5 +1,6 @@
 package LittleMuffinBot;
 import battlecode.common.*;
+
 public strictfp class WatchTower {
     static Direction exploreDir = null;
     static void watchDispatcher(RobotController rc) throws GameActionException {
@@ -15,6 +16,8 @@ public strictfp class WatchTower {
                 portableMode(rc);
             }
         }
+
+        findEnemyArchon.sense(rc);
 
     }
     static void turretMode(RobotController rc, RobotInfo [] robots) throws GameActionException {
@@ -48,7 +51,7 @@ public strictfp class WatchTower {
     static void portableMode(RobotController rc) throws GameActionException {
         RobotInfo[] robots = rc.senseNearbyRobots(rc.getType().visionRadiusSquared, rc.getTeam().opponent());
         while(robots.length <= 5){
-            exploreMode(rc);
+            Exploration.run(rc);
             robots = rc.senseNearbyRobots(rc.getType().visionRadiusSquared, rc.getTeam().opponent());
         }
         if(robots.length > 5 && rc.canTransform()){
@@ -56,7 +59,7 @@ public strictfp class WatchTower {
             turretMode(rc, robots);
         }
     }
-
+/*
     static void exploreMode(RobotController rc) throws GameActionException {
         if (exploreDir == null) {
             RobotPlayer.rng.setSeed(rc.getID());
@@ -74,4 +77,6 @@ public strictfp class WatchTower {
             rc.move(dir);
         }
     }
+    
+ */
 }

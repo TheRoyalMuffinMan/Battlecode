@@ -1,8 +1,9 @@
 package LittleMuffinBot;
 
-import battlecode.common.*;
-import java.util.List;
-import java.util.Map;
+import battlecode.common.MapLocation;
+import battlecode.common.RobotController;
+import battlecode.common.RobotInfo;
+import battlecode.common.Team;
 
 public class Laboratory {
     static MapLocation location;

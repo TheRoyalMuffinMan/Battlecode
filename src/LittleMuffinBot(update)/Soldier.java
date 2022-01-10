@@ -16,6 +16,8 @@ public class Soldier {
         vision = rc.getType().visionRadiusSquared;
         scanMode(rc);
         attackMode(rc);
+        Exploration.run();
+        findEnemyArchon.sense(rc);
     }
 
     // Perform a scan for nearby Archons then save the result in the sharable array

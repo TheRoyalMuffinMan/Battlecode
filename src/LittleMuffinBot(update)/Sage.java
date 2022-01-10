@@ -21,6 +21,8 @@ public strictfp class Sage {
         } else if (turretBuilding > 50){
             anomaly(rc,AnomalyType.FURY);
         }
+        Exploration.run();
+        findEnemyArchon.sense(rc);
     }
 
     static void attack(RobotController rc, RobotInfo robot, MapLocation location) throws GameActionException {

@@ -8,11 +8,21 @@ import java.util.Comparator;
 public strictfp class Builder {
 
     static Direction exploreDir = null;
-
+    static int watchTowers = 0;
+    static int laboratories = 0;
     static void builderDispatcher(RobotController rc) throws GameActionException {
         scan(rc);
-        createBuilding(rc, RobotType.WATCHTOWER);
+        RobotInfo[] enemyRobots = rc.senseNearbyRobots(rc.getType().visionRadiusSquared, rc.getTeam().opponent());
+        if(watchTowers < 2 || enemyRobots.length > 0){
+            createBuilding(rc, RobotType.WATCHTOWER);
+            watchTowers++;
+        } else {
+            createBuilding(rc, RobotType.LABORATORY);
+            laboratories++;
+        }
         Exploration.run(rc);
+        findEnemyArchon.sense(rc);
+
     }
 
     static void scan(RobotController rc) throws GameActionException {

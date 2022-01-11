@@ -43,7 +43,7 @@ public class Exploration {
                     }
                     break;
                 case 3:
-                    diffDir = dir.rotateRight().rotateRight();
+                    diffDir = dir.rotateRight().rotateRight().rotateRight();
                     if (!rc.onTheMap(src.add(diffDir))) {
                         diffDir = dir.rotateLeft().rotateLeft().rotateLeft();
                     }

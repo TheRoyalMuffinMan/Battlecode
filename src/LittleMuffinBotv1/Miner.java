@@ -56,9 +56,15 @@ public strictfp class Miner {
     // Scan for nearby deposits in the static map we collected from all the robots this turn.
     private static void scan(RobotController rc) throws GameActionException {
         rc.setIndicatorString("Scanning");
+        MapLocation[] gold = rc.senseNearbyLocationsWithGold(vision);
         MapLocation[] lead = rc.senseNearbyLocationsWithLead(vision); // Bytecode: 100
         friendlies = rc.senseNearbyRobots(vision, RobotPlayer.team);
         enemies = rc.senseNearbyRobots(vision, RobotPlayer.otherTeam);
+        for (MapLocation position : gold) {
+            if (rc.senseGold(position) > 6) {
+                deposits.put(position, rc.senseLead(position));
+            }
+        }
         for (MapLocation position : lead) {
             if (rc.senseLead(position) > 6) {
                 deposits.put(position, rc.senseLead(position));
@@ -75,7 +81,7 @@ public strictfp class Miner {
         for (int dx = -1; dx <= 1; dx++) {
             for (int dy = -1; dy <= 1; dy++) {
                 MapLocation mineLocation = new MapLocation(location.x + dx, location.y + dy);
-                while (rc.canMineGold(mineLocation) && rc.senseLead(mineLocation) > 1) {
+                while (rc.canMineGold(mineLocation) && rc.senseGold(mineLocation) > 1) {
                     minerIsMining = true;
                     rc.mineGold(mineLocation);
                 }
@@ -91,11 +97,11 @@ public strictfp class Miner {
     // Searching is done here, we search for the highest deposit and start going toward it.
     private static void search(RobotController rc) throws GameActionException {
         MapLocation biggestDeposit = null;
-        int maxLead = Integer.MIN_VALUE;
+        int maxDep = Integer.MIN_VALUE;
         for (Map.Entry<MapLocation, Integer> deposit : deposits.entrySet()) {
-            int lead = deposit.getValue();
-            if (lead > maxLead) {
-                maxLead = lead;
+            int dep = deposit.getValue();
+            if (dep > maxDep) {
+                maxDep = dep;
                 biggestDeposit = deposit.getKey();
             }
         }

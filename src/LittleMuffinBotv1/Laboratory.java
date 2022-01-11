@@ -9,25 +9,21 @@ public class Laboratory {
     static int vision;
     static int nearbyFriendlies = 0, nearbyEnemies = 0;
 
-    static void run(RobotController rc) {
+    static void run(RobotController rc) throws GameActionException {
         location = rc.getLocation();
         vision = rc.getType().visionRadiusSquared;
+        while(true) {
+            if (rc.senseNearbyRobots().length > 2) {
+                avoid(rc);
+            } else {
+                transmute(rc);
+            }
+        }
     }
 
     // Stay away from other bots
-    static void scan(RobotController rc) throws GameActionException {
+    static void avoid(RobotController rc) throws GameActionException {
         rc.setIndicatorString("Scanning");
-       /* RobotInfo[] robots = rc.senseNearbyRobots(); // Bytecode: 100
-        Team otherTeam = rc.getTeam().opponent();
-        nearbyFriendlies = nearbyEnemies = 0;
-        for (RobotInfo robot : robots) {
-            if (robot.getTeam() == otherTeam) {
-                nearbyEnemies++;
-            } else {
-                nearbyFriendlies++;
-            }
-        }
-        */
         int goUp = 0;
         int goDown = 0;
         int goLeft = 0;
@@ -35,7 +31,7 @@ public class Laboratory {
         RobotInfo[] robots = rc.senseNearbyRobots();
         if (robots.length > 5) {
             for (int i = 0; i < robots.length; i++) {
-                if (robots[i].getTeam().equals(rc.getTeam().opponent())) {
+                if (robots[i].getTeam().equals(rc.getTeam())) {
                     if (robots[i].getType().equals(RobotType.SOLDIER) || robots[i].getType().equals(RobotType.SAGE) || robots[i].getType().equals(RobotType.WATCHTOWER)) {
                         int dy = robots[i].location.y - rc.getLocation().y;
                         int dx = robots[i].location.x - rc.getLocation().x;
@@ -113,11 +109,11 @@ public class Laboratory {
         }
     }
 
-    static void transmute(RobotController rc) {
-        // Needs to be implemented
+    static void transmute(RobotController rc) throws GameActionException {
+        if(rc.canTransmute()){
+            rc.transmute();
+        }
     }
 
-    static void avoid(RobotController rc) {
-        // Needs to be implemented
-    }
+
 }

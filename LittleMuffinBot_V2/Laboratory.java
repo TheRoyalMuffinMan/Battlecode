@@ -1,6 +1,8 @@
-package LittleMuffinBot_V2;
+package LittleMuffinBotv1;
 
 import battlecode.common.*;
+import java.util.List;
+import java.util.Map;
 
 public class Laboratory {
     static MapLocation location;
@@ -60,7 +62,7 @@ public class Laboratory {
                     }
                 }
             }
-            
+
             Direction dir = Direction.CENTER;
             if (goUp > goDown) {
                 if (goLeft > goRight) {
@@ -108,9 +110,10 @@ public class Laboratory {
     }
 
     static void transmute(RobotController rc) throws GameActionException {
-        if (rc.canTransmute()){
+        if(rc.canTransmute()){
             rc.transmute();
         }
     }
+
 
 }

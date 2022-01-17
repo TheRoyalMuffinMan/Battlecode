@@ -2,6 +2,8 @@ package LittleMuffinBot_V4;
 
 import battlecode.common.*;
 
+import java.util.Map;
+
 /**
     Miner's Attributes:
     - Is the resource gathering unit.
@@ -30,6 +32,9 @@ public strictfp class Miner implements Attributes {
      */
     public static void run(RobotController rc) throws GameActionException {
         initialize(rc);
+        if(enemies.length > 0) {
+            retreat(rc);
+        }
         scan(rc);
         // If the miner is mining, it doesn't want to move.
         if (!mine(rc)) {
@@ -49,6 +54,7 @@ public strictfp class Miner implements Attributes {
         ID = rc.getID();
         level = rc.getLevel();
         vision = type.visionRadiusSquared;
+        enemies = rc.senseNearbyRobots(location, vision, RobotPlayer.otherTeam);;
     }
 
 
@@ -127,5 +133,89 @@ public strictfp class Miner implements Attributes {
             rc.setIndicatorString("Searching");
             Pathing.walkTowards(rc, biggestDeposit);
         }
+    }
+
+    private static void retreat(RobotController rc) throws GameActionException{
+        System.out.print("retreating");
+        rc.setIndicatorString("Retreating");
+        int avgX = 0;
+        int avgY = 0;
+        String direction = "Random";
+        int count = 0;
+
+        for(int i = 0; i<enemies.length; i++){
+            if(!(enemies[i].type.equals(RobotType.MINER) || enemies[i].type.equals(RobotType.BUILDER)));
+            {
+                avgX += enemies[i].location.x;
+                avgY += enemies[i].location.y;
+                count++;
+            }
+        }
+        if(count > 0) {
+            avgX = avgX / enemies.length;
+            avgY = avgY / enemies.length;
+
+            int x = avgX - location.x;
+            int y = avgY - location.y;
+            MapLocation loc;
+            if (Math.abs(x) >= Math.abs((y * 2)) || y == 0) { //if x is substantially larger than y or if y = 0, only move left/right
+                if (x > 0) {
+                    direction = "west";
+                    loc = new MapLocation(0, location.y); //move left (West)
+                    Pathing.walkTowards(rc, loc);
+                } else {
+                    direction = "east";
+                    loc = new MapLocation(rc.getMapWidth(), location.y); //move right (East)
+                    Pathing.walkTowards(rc, loc);
+                }
+            } else if (Math.abs(y) >= Math.abs((x * 2)) || x == 0) { //if y is substanitally larger than x or if x = 0, only move up/down
+                if (y > 0) {
+                    direction = "south";
+                    loc = new MapLocation(location.x, 0); //move down (south)
+                    Pathing.walkTowards(rc, loc);
+                } else {
+                    direction = "north";
+                    loc = new MapLocation(location.x, rc.getMapHeight()); //move up (north)
+                    Pathing.walkTowards(rc, loc);
+                }
+            } else {
+                if (y > 0 && x > 0) {
+                    direction = "southwest";
+                    loc = new MapLocation(0, 0); //move southwest (left and down)
+                    Pathing.walkTowards(rc, loc);
+                } else if (y > 0 && x < 0) {
+                    direction = "southeast";
+                    loc = new MapLocation(rc.getMapWidth(), 0); //move southeast (right and down)
+                    Pathing.walkTowards(rc, loc);
+                } else if (y < 0 && x > 0) {
+                    direction = "northwest";
+                    loc = new MapLocation(0, rc.getMapHeight()); //move northwest (left and up)
+                    Pathing.walkTowards(rc, loc);
+                } else if (y < 0 && x < 0) {
+                    direction = "northeast";
+                    loc = new MapLocation(rc.getMapWidth(), rc.getMapHeight()); //move northeast (right and up)
+                    Pathing.walkTowards(rc, loc);
+                } else {
+                    direction = "away from closest archon";
+                    int closest = Integer.MAX_VALUE; //difference between closest archon and miner. found by summing deltax and deltay of archon
+                    MapLocation closestArchon = new MapLocation(closest, closest);  //the closest archon
+                    for (int i = 0; i < rc.getArchonCount(); i++) {        //determining which archon is the closest to run away from it
+                        int read = rc.readSharedArray(i);
+                        int archonX = read >> 8;
+                        int archonY = read & 0xFF;
+                        int deltaX = Math.abs(archonX - rc.getLocation().x);
+                        int deltaY = Math.abs(archonY - rc.getLocation().y);
+                        if (deltaX + deltaY < closest) {
+                            closest = deltaX + deltaY;
+                            closestArchon = new MapLocation(-archonX, -archonY);
+                        }
+                    }
+                    Pathing.walkTowards(rc, closestArchon);
+                }
+
+            }
+        }
+        System.out.println("retreat " + direction);
+
     }
 }

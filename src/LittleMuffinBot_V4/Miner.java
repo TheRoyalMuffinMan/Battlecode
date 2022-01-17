@@ -128,4 +128,28 @@ public strictfp class Miner implements Attributes {
             Pathing.walkTowards(rc, biggestDeposit);
         }
     }
+
+    // Method for getting lead count of lead deposits
+    private static int getLeadCount(int rangeIndex) {
+        switch (rangeIndex) {
+            case 0:
+            case 1: return 1;
+            case 2: return 14;
+            case 3: return 27;
+            case 4: return 40;
+            case 5: return 53;
+            case 6: return 66;
+            case 7: return 79;
+            case 8: return 92;
+            case 9: return 105;
+            case 10: return 118;
+            case 11: return 131;
+            case 12: return 144;
+            case 13: return 157;
+            case 14: return 170;
+            case 15: return 183;
+            case 16: return 196;
+        }
+        return -1;
+    }
 }
